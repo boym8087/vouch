@@ -7,4 +7,4 @@ pages_build_output_dir = "public"
 [[d1_databases]]
 binding = "DB"
 database_name = "vouch-db"
-database_id = "PASTE_YOUR_DATABASE_ID_HERE"
+database_id = "1b974aba-16a3-4876-8ab7-9541872a7e9c"
