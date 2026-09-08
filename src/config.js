@@ -1,9 +1,24 @@
 // ---------------------------------------------------------------------------
 // This is the only file you need to edit to change the form.
-// Add students, change questions, reorder them. Nothing else has to move.
+// Edit the ROLE, add applicants to ROSTER, change QUESTIONS. Nothing else moves.
 // ---------------------------------------------------------------------------
 
-// Each student gets a link: https://your-site.pages.dev/f/<slug>
+// The position these references are for. {name} becomes the applicant's name.
+// Edit this freely if the role or dates change.
+export const ROLE = {
+  company: "SkyWorks",
+  title: "Cybersecurity Winter/Spring Co-Op (Jan–June 2027)",
+  location: "Irvine, CA",
+  postingDate: "August 20, 2026",
+  // Shown on the form so recommenders know who they're vouching to. Fictional.
+  about:
+    "SkyWorks is a product company based in Irvine, California. Its cybersecurity team works alongside engineering and product on regulatory readiness (including the EU Cyber Resilience Act), data-security posture, and cyber-resilience testing. This co-op is a full-time, six-month term supporting that work.",
+  intro:
+    "{name} is applying for the SkyWorks Cybersecurity Winter/Spring Co-Op (Jan–June 2027) in Irvine, and asked you to speak to how they'd do in it. It takes about five minutes. What you write goes to {name} and may be shared with the SkyWorks hiring team, so write it the way you'd want it read.",
+};
+
+// Each applicant gets a link: https://your-site.pages.dev/f/<slug>
+// slug = the tail of the URL (lowercase, no spaces). name = shown on the form.
 export const ROSTER = [
   { slug: "jordan", name: "Jordan Reyes" },
   { slug: "amara", name: "Amara Chen" },
@@ -18,7 +33,7 @@ export const RESPONDENT_FIELDS = [
     label: "Your title and where you work or study",
     type: "text",
     required: true,
-    placeholder: "Lecturer, Dept. of Biology, State University",
+    placeholder: "Lecturer, Dept. of Computer Science, State University",
   },
   { id: "respondent_email", label: "Your email", type: "email", required: true },
   {
@@ -30,34 +45,66 @@ export const RESPONDENT_FIELDS = [
   },
 ];
 
-// Questions about the candidate. Types: "text", "textarea", "choice".
-// Add, remove, or reword freely — answers are stored as JSON, so there's no
-// database change to make when this list changes.
+// These three map to real database columns. Any other respondent field you add
+// above is stored in the JSON blob automatically — no migration needed.
+export const RESPONDENT_COLUMNS = [
+  "respondent_name",
+  "respondent_email",
+  "respondent_phone",
+];
+
+// Questions about the applicant. Types: "text", "textarea", "choice".
+// These map to what this co-op screens for: initiative, critical thinking,
+// communication, follow-through, and genuine security interest. Reword freely —
+// answers are stored as JSON, so changing this list needs no database change.
 export const QUESTIONS = [
   {
     id: "relationship",
     label: "How do you know {name}, and for how long?",
     type: "text",
     required: true,
-    placeholder: "Supervised them for two semesters in the writing center",
+    placeholder: "Course instructor for two semesters; supervised their capstone",
   },
   {
-    id: "strengths",
-    label: "What are {name}'s strengths in a work or academic setting?",
+    id: "initiative",
+    label:
+      "This role hands people ambiguous assignments and expects them to move things forward without being asked. Have you seen {name} work that way?",
     type: "textarea",
     required: true,
-    help: "A few sentences is plenty. Concrete beats glowing.",
+    help: "A specific instance is worth more than a general impression.",
   },
   {
-    id: "with_others",
-    label: "How does {name} work with other people?",
+    id: "critical_thinking",
+    label:
+      "How would you describe {name}'s critical thinking — questioning assumptions, telling a real risk from noise?",
     type: "textarea",
     required: true,
-    help: "Explaining things to peers, taking direction, handling disagreement — whatever you've seen.",
+  },
+  {
+    id: "communication",
+    label:
+      "How is {name}'s written and verbal communication, especially explaining technical detail to a non-technical audience?",
+    type: "textarea",
+    required: true,
+  },
+  {
+    id: "follow_through",
+    label:
+      "The work is juggling many open items to closure so nothing quietly drops. How does {name} handle organization and follow-through?",
+    type: "textarea",
+    required: true,
+  },
+  {
+    id: "security_interest",
+    label:
+      "What's the basis for {name}'s interest in cybersecurity, compliance, or risk — coursework, certs, projects, anything you've seen?",
+    type: "textarea",
+    required: false,
+    help: "Optional.",
   },
   {
     id: "recommend",
-    label: "Would you recommend {name} for a job or TA position?",
+    label: "Would you recommend {name} for this co-op?",
     type: "choice",
     required: true,
     options: [
@@ -68,20 +115,12 @@ export const QUESTIONS = [
     ],
   },
   {
-    id: "example",
-    label: "Anything else a hiring manager or faculty supervisor should know?",
+    id: "anything_else",
+    label: "Anything else the hiring team should know?",
     type: "textarea",
     required: false,
-    help: "Optional. A specific example carries further than a general endorsement.",
+    help: "Optional. A concrete example carries further than a general endorsement.",
   },
-];
-
-// These three have their own database columns. Any other respondent field you
-// add above is stored in the JSON blob automatically — no migration needed.
-export const RESPONDENT_COLUMNS = [
-  "respondent_name",
-  "respondent_email",
-  "respondent_phone",
 ];
 
 export function findStudent(slug) {
