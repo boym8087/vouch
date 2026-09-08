@@ -1,30 +1,28 @@
 import {
+  APPLICANT,
   QUESTIONS,
   RESPONDENT_FIELDS,
   ROLE,
-  findStudent,
 } from "../../src/config.js";
 import { band, esc, html, page } from "../../src/render.js";
 
-function label(text, name) {
-  return text.replace(/\{name\}/g, name);
+function label(text) {
+  return text.replace(/\{name\}/g, APPLICANT);
 }
 
 function required(field) {
-  return field.required
-    ? ` <span class="req" title="Required">*</span>`
-    : "";
+  return field.required ? ` <span class="req" title="Required">*</span>` : "";
 }
 
 function help(field) {
   return field.help ? `<span class="help">${esc(field.help)}</span>` : "";
 }
 
-function renderField(field, name) {
-  const text = esc(label(field.label, name));
+function renderField(field) {
+  const text = esc(label(field.label));
   const req = field.required ? " required" : "";
   const ph = field.placeholder
-    ? ` placeholder="${esc(label(field.placeholder, name))}"`
+    ? ` placeholder="${esc(label(field.placeholder))}"`
     : "";
 
   if (field.type === "choice") {
@@ -55,32 +53,17 @@ ${control}
 </div>`;
 }
 
-export function onRequestGet({ params, env }) {
-  const student = findStudent(params.slug || "");
-
-  if (!student) {
-    return html(
-      page({
-        title: "Link not found",
-        band: band("Hmm", "This link doesn't match anyone"),
-        body: `<p class="intro">Double-check the address, or ask the person who sent it for a fresh link.</p>`,
-      }),
-      404
-    );
-  }
-
+export function onRequestGet({ env }) {
   const siteKey = env.TURNSTILE_SITE_KEY;
   const widget = siteKey
     ? `<div class="field"><div class="cf-turnstile" data-sitekey="${esc(siteKey)}"></div></div>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>`
     : "";
 
-  const fields = [
-    ...RESPONDENT_FIELDS.map((f) => renderField(f, student.name)),
-    ...QUESTIONS.map((f) => renderField(f, student.name)),
-  ].join("\n");
+  const fields = [...RESPONDENT_FIELDS, ...QUESTIONS]
+    .map((f) => renderField(f))
+    .join("\n");
 
-  const intro = ROLE.intro.replace(/\{name\}/g, student.name);
   const roleCard = `<div class="rolecard">
 <p class="rolecard-title">${esc(ROLE.title)}</p>
 <p class="rolecard-meta">${esc(ROLE.company)} · ${esc(ROLE.location)}${
@@ -88,10 +71,10 @@ export function onRequestGet({ params, env }) {
   }</p>
 <p class="rolecard-about">${esc(ROLE.about)}</p>
 </div>`;
-  const body = `<p class="intro">${esc(intro)}</p>
+
+  const body = `<p class="intro">${esc(ROLE.intro)}</p>
 ${roleCard}
 <form method="POST" action="/api/submit">
-<input type="hidden" name="subject_slug" value="${esc(student.slug)}">
 ${fields}
 ${widget}
 <button type="submit">Send this in</button>
@@ -100,8 +83,8 @@ ${widget}
 
   return html(
     page({
-      title: `Reference for ${student.name}`,
-      band: band("A reference for", student.name),
+      title: `Reference — ${ROLE.company} Co-Op`,
+      band: band(`A reference for the ${ROLE.company}`, "Cybersecurity Co-Op"),
       body,
     })
   );
