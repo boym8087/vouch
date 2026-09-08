@@ -158,3 +158,26 @@ button[disabled] { opacity: 0.55; cursor: default; }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
 }
+
+/* Role / company card on the form */
+.rolecard {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--marigold);
+  border-radius: 3px;
+  background: #fbfbf9;
+  padding: 1rem 1.15rem;
+  margin: 0 0 2.5rem;
+}
+.rolecard-title {
+  font-weight: 700;
+  margin: 0 0 0.15rem;
+}
+.rolecard-meta {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin: 0 0 0.7rem;
+}
+.rolecard-about {
+  margin: 0;
+  font-size: 0.95rem;
+}
