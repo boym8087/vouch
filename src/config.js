@@ -29,7 +29,7 @@ export const RESPONDENT_FIELDS = [
     type: "text",
     required: true,
     help: "The student's full name, as it appears on their application.",
-    placeholder: "Jordan Reyes",
+    placeholder: "Student Name",
   },
   { id: "respondent_name", label: "Your name", type: "text", required: true },
   {
@@ -78,7 +78,7 @@ export const QUESTIONS = [
   {
     id: "critical_thinking",
     label:
-      "How would you describe {name}'s critical thinking — questioning assumptions, telling a real risk from noise?",
+      "How would you describe {name}'s critical thinking?",
     type: "textarea",
     required: true,
   },
@@ -92,14 +92,14 @@ export const QUESTIONS = [
   {
     id: "follow_through",
     label:
-      "The work is juggling many open items to closure so nothing quietly drops. How does {name} handle organization and follow-through?",
+      "The job has many different projects in various stages of development at once. How does {name} handle organization and follow-through?",
     type: "textarea",
     required: true,
   },
   {
     id: "security_interest",
     label:
-      "What's the basis for {name}'s interest in cybersecurity, compliance, or risk — coursework, certs, projects, anything you've seen?",
+      "What's the basis for {name}'s interest in cybersecurity, compliance, or risk, coursework, certs, projects, anything you've seen?",
     type: "textarea",
     required: false,
     help: "Optional.",
