@@ -1,8 +1,9 @@
 import {
+  APPLICANT,
   QUESTIONS,
   RESPONDENT_COLUMNS,
   RESPONDENT_FIELDS,
-  findStudent,
+  slugifyName,
 } from "../../src/config.js";
 import { band, esc, html, page } from "../../src/render.js";
 
@@ -37,9 +38,6 @@ async function passesTurnstile(env, token, ip) {
 export async function onRequestPost({ request, env }) {
   const form = await request.formData();
 
-  const student = findStudent(form.get("subject_slug") || "");
-  if (!student) return fail("That form link isn't valid anymore.");
-
   const ok = await passesTurnstile(
     env,
     form.get("cf-turnstile-response"),
@@ -51,9 +49,7 @@ export async function onRequestPost({ request, env }) {
 
   for (const f of [...RESPONDENT_FIELDS, ...QUESTIONS]) {
     if (f.required && !read(f.id)) {
-      return fail(
-        `"${f.label.replace(/\{name\}/g, student.name)}" needs an answer.`
-      );
+      return fail(`"${f.label.replace(/\{name\}/g, APPLICANT)}" needs an answer.`);
     }
   }
 
@@ -62,6 +58,10 @@ export async function onRequestPost({ request, env }) {
     return fail("That email address doesn't look right.");
   }
 
+  const applicantName = read("applicant_name");
+
+  // Everything not stored in a real column goes into the answers JSON:
+  // the question answers plus extra respondent fields (applicant_name, role).
   const answers = {};
   for (const q of QUESTIONS) answers[q.id] = read(q.id);
   for (const f of RESPONDENT_FIELDS) {
@@ -74,7 +74,7 @@ export async function onRequestPost({ request, env }) {
      VALUES (?, ?, ?, ?, ?, ?)`
   )
     .bind(
-      student.slug,
+      slugifyName(applicantName),
       read("respondent_name"),
       email,
       read("respondent_phone"),
@@ -87,9 +87,9 @@ export async function onRequestPost({ request, env }) {
     page({
       title: "Thanks",
       band: band("Sent", "Thank you"),
-      body: `<p class="intro">That's recorded. ${esc(
-        student.name
-      )} will have it for their applications. If you need to correct something, email them directly and they can pass it along.</p>`,
+      body: `<p class="intro">That's recorded. Your reference for ${esc(
+        applicantName
+      )} has been saved for their SkyWorks application. If you need to correct something, reach out to them directly.</p>`,
     })
   );
 }
