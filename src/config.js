@@ -1,32 +1,36 @@
 // ---------------------------------------------------------------------------
 // This is the only file you need to edit to change the form.
-// Edit the ROLE, add applicants to ROSTER, change QUESTIONS. Nothing else moves.
+// Edit the ROLE, change QUESTIONS, adjust the recommender fields. One form now
+// serves every applicant — the recommender types in who they're recommending.
 // ---------------------------------------------------------------------------
 
-// The position these references are for. {name} becomes the applicant's name.
-// Edit this freely if the role or dates change.
+// The position these references are for. Fictional company, fictional posting.
 export const ROLE = {
   company: "SkyWorks",
   title: "Cybersecurity Winter/Spring Co-Op (Jan–June 2027)",
   location: "Irvine, CA",
   postingDate: "August 20, 2026",
-  // Shown on the form so recommenders know who they're vouching to. Fictional.
+  // Shown on the form so recommenders know who they're vouching to.
   about:
-    "SkyWorks is a product company based in Irvine, California. Its cybersecurity team works alongside engineering and product on regulatory readiness (including the EU Cyber Resilience Act), data-security posture, and cyber-resilience testing. This co-op is a full-time, six-month term supporting that work.",
+    "SkyWorks is a cybersecurity company based in Irvine, California. Its cybersecurity team works alongside engineering and product on regulatory readiness (including the EU Cyber Resilience Act), data-security posture, and cyber-resilience testing. This co-op is a full-time, six-month term supporting that work.",
   intro:
-    "{name} is applying for the SkyWorks Cybersecurity Winter/Spring Co-Op (Jan–June 2027) in Irvine, and asked you to speak to how they'd do in it. It takes about five minutes. What you write goes to {name} and may be shared with the SkyWorks hiring team, so write it the way you'd want it read.",
+    "You've been asked to give a reference for a student applying to the SkyWorks Cybersecurity Winter/Spring Co-Op (Jan–June 2027) in Irvine. It takes about five minutes. What you write goes to the student and may be shared with the SkyWorks hiring team, so write it the way you'd want it read.",
 };
 
-// Each applicant gets a link: https://your-site.pages.dev/f/<slug>
-// slug = the tail of the URL (lowercase, no spaces). name = shown on the form.
-export const ROSTER = [
-  { slug: "jordan", name: "Jordan Reyes" },
-  { slug: "amara", name: "Amara Chen" },
-  { slug: "diego", name: "Diego Santos" },
-];
+// Word used in the questions in place of a specific name, since one form now
+// covers every applicant.
+export const APPLICANT = "the applicant";
 
-// Fields about the person giving the reference.
+// Fields about the person giving the reference — plus who they're recommending.
 export const RESPONDENT_FIELDS = [
+  {
+    id: "applicant_name",
+    label: "Who are you recommending?",
+    type: "text",
+    required: true,
+    help: "The student's full name, as it appears on their application.",
+    placeholder: "Jordan Reyes",
+  },
   { id: "respondent_name", label: "Your name", type: "text", required: true },
   {
     id: "respondent_role",
@@ -45,8 +49,8 @@ export const RESPONDENT_FIELDS = [
   },
 ];
 
-// These three map to real database columns. Any other respondent field you add
-// above is stored in the JSON blob automatically — no migration needed.
+// These map to real database columns. Any other respondent field you add above —
+// including applicant_name — is stored in the JSON blob automatically.
 export const RESPONDENT_COLUMNS = [
   "respondent_name",
   "respondent_email",
@@ -54,9 +58,7 @@ export const RESPONDENT_COLUMNS = [
 ];
 
 // Questions about the applicant. Types: "text", "textarea", "choice".
-// These map to what this co-op screens for: initiative, critical thinking,
-// communication, follow-through, and genuine security interest. Reword freely —
-// answers are stored as JSON, so changing this list needs no database change.
+// {name} is replaced with APPLICANT ("the applicant") at display time.
 export const QUESTIONS = [
   {
     id: "relationship",
@@ -123,6 +125,13 @@ export const QUESTIONS = [
   },
 ];
 
-export function findStudent(slug) {
-  return ROSTER.find((s) => s.slug === slug.toLowerCase());
+// Turn an applicant's typed name into a slug for grouping in the database.
+export function slugifyName(name) {
+  return (
+    (name || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "")
+      .slice(0, 60) || "applicant"
+  );
 }
