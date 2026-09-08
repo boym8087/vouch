@@ -1,4 +1,9 @@
-import { QUESTIONS, RESPONDENT_FIELDS, findStudent } from "../../src/config.js";
+import {
+  QUESTIONS,
+  RESPONDENT_FIELDS,
+  ROLE,
+  findStudent,
+} from "../../src/config.js";
 import { band, esc, html, page } from "../../src/render.js";
 
 function label(text, name) {
@@ -75,11 +80,16 @@ export function onRequestGet({ params, env }) {
     ...QUESTIONS.map((f) => renderField(f, student.name)),
   ].join("\n");
 
-  const body = `<p class="intro">${esc(
-    student.name
-  )} is applying for jobs and teaching assistant positions, and asked you to speak to their work. Takes about five minutes. What you write goes to ${esc(
-    student.name
-  )} and may be passed on to a hiring manager or faculty supervisor, so write it as you'd want it read.</p>
+  const intro = ROLE.intro.replace(/\{name\}/g, student.name);
+  const roleCard = `<div class="rolecard">
+<p class="rolecard-title">${esc(ROLE.title)}</p>
+<p class="rolecard-meta">${esc(ROLE.company)} · ${esc(ROLE.location)}${
+    ROLE.postingDate ? ` · posted ${esc(ROLE.postingDate)}` : ""
+  }</p>
+<p class="rolecard-about">${esc(ROLE.about)}</p>
+</div>`;
+  const body = `<p class="intro">${esc(intro)}</p>
+${roleCard}
 <form method="POST" action="/api/submit">
 <input type="hidden" name="subject_slug" value="${esc(student.slug)}">
 ${fields}
