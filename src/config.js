@@ -99,7 +99,7 @@ export const QUESTIONS = [
   {
     id: "security_interest",
     label:
-      "What's the basis for {name}'s interest in cybersecurity, compliance, or risk, coursework, certs, projects, anything you've seen?",
+      "What's the basis for {name}'s interest in cybersecurity, compliance, or risk, coursework, certs, projects, or through anything you've seen?",
     type: "textarea",
     required: false,
     help: "Optional.",
