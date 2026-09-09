@@ -181,3 +181,6 @@ button[disabled] { opacity: 0.55; cursor: default; }
   margin: 0;
   font-size: 0.95rem;
 }
+/* Reveal page video embed */
+.video { position: relative; padding-bottom: 56.25%; height: 0; margin: 1.5rem 0; }
+.video iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
