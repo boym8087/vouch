@@ -11,7 +11,7 @@ const MAX_LEN = 4000;
 
 // Where to send the respondent after a successful submission.
 // Must be a hardcoded absolute URL — never build this from form input.
-const THANKS_URL = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+const THANKS_PATH = "/thanks";
 
 function fail(message, status = 400) {
   return html(
@@ -103,7 +103,7 @@ export async function onRequestPost({ request, env }) {
     );
   }
 
-  return redirect(THANKS_URL);
+    return redirect(new URL(THANKS_PATH, request.url).toString());
 }
 
 export function onRequestGet({ request }) {
