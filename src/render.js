@@ -8,7 +8,7 @@ export function esc(value) {
   })[c]);
 }
 
-export function page({ title, band, body, wide = false }) {
+export function page({ title, band: bandMarkup, body, wide = false }) {
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -22,7 +22,7 @@ export function page({ title, band, body, wide = false }) {
 <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-${band}
+${bandMarkup}
 <main class="sheet${wide ? " results-wide" : ""}">
 ${body}
 </main>
@@ -42,6 +42,16 @@ export function html(markup, status = 200) {
     status,
     headers: {
       "content-type": "text/html; charset=utf-8",
+      "cache-control": "no-store",
+    },
+  });
+}
+
+export function redirect(location, status = 303) {
+  return new Response(null, {
+    status,
+    headers: {
+      location,
       "cache-control": "no-store",
     },
   });
