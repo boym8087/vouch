@@ -9,7 +9,7 @@ export function onRequestGet() {
 <p class="intro">Nothing here is a real opportunity. This is what a convincing phishing page looks like from the inside.</p>
 <div class="video">
 <iframe width="560" height="315"
-  src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+  src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1"
   title="YouTube video player"
   frameborder="0"
   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
