@@ -5,9 +5,13 @@ import {
   RESPONDENT_FIELDS,
   slugifyName,
 } from "../../src/config.js";
-import { band, esc, html, page } from "../../src/render.js";
+import { band, esc, html, page, redirect } from "../../src/render.js";
 
 const MAX_LEN = 4000;
+
+// Where to send the respondent after a successful submission.
+// Must be a hardcoded absolute URL — never build this from form input.
+const THANKS_URL = "https://example.com/thanks";
 
 function fail(message, status = 400) {
   return html(
@@ -22,17 +26,25 @@ function fail(message, status = 400) {
 }
 
 async function passesTurnstile(env, token, ip) {
-  if (!env.TURNSTILE_SECRET) return true; // not configured yet
+  if (!env.TURNSTILE_SECRET) {
+    console.warn("TURNSTILE_SECRET not set — spam check skipped");
+    return true;
+  }
   const body = new FormData();
   body.append("secret", env.TURNSTILE_SECRET);
   body.append("response", token || "");
   if (ip) body.append("remoteip", ip);
-  const res = await fetch(
-    "https://challenges.cloudflare.com/turnstile/v0/siteverify",
-    { method: "POST", body }
-  );
-  const data = await res.json();
-  return data.success === true;
+  try {
+    const res = await fetch(
+      "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+      { method: "POST", body }
+    );
+    const data = await res.json();
+    return data.success === true;
+  } catch (err) {
+    console.error("turnstile verify failed", err);
+    return false;
+  }
 }
 
 export async function onRequestPost({ request, env }) {
@@ -68,32 +80,32 @@ export async function onRequestPost({ request, env }) {
     if (!RESPONDENT_COLUMNS.includes(f.id)) answers[f.id] = read(f.id);
   }
 
-  await env.DB.prepare(
-    `INSERT INTO responses
-       (subject_slug, respondent_name, respondent_email, respondent_phone, answers, created_at)
-     VALUES (?, ?, ?, ?, ?, ?)`
-  )
-    .bind(
-      slugifyName(applicantName),
-      read("respondent_name"),
-      email,
-      read("respondent_phone"),
-      JSON.stringify(answers),
-      new Date().toISOString()
+  try {
+    await env.DB.prepare(
+      `INSERT INTO responses
+         (subject_slug, respondent_name, respondent_email, respondent_phone, answers, created_at)
+       VALUES (?, ?, ?, ?, ?, ?)`
     )
-    .run();
+      .bind(
+        slugifyName(applicantName),
+        read("respondent_name"),
+        email,
+        read("respondent_phone"),
+        JSON.stringify(answers),
+        new Date().toISOString()
+      )
+      .run();
+  } catch (err) {
+    console.error("insert failed", err);
+    return fail(
+      "Something went wrong saving that. Try submitting again in a moment.",
+      500
+    );
+  }
 
-  return html(
-    page({
-      title: "Thanks",
-      band: band("Sent", "Thank you"),
-      body: `<p class="intro">That's recorded. Your reference for ${esc(
-        applicantName
-      )} has been saved for their SkyWorks application. If you need to correct something, reach out to them directly.</p>`,
-    })
-  );
+  return redirect(https://www.youtube.com/watch?v=dQw4w9WgXcQ);
 }
 
-export function onRequestGet() {
-  return Response.redirect("/", 302);
+export function onRequestGet({ request }) {
+  return redirect(new URL("/", request.url).toString(), 302);
 }
